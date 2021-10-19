@@ -30,6 +30,7 @@ class DownloadManagerImpl(private val httpDownloader: Downloader<*, *>,
                           private val namespace: String,
                           private val groupInfoProvider: GroupInfoProvider,
                           private val globalAutoRetryMaxAttempts: Int,
+                          private val bandwidthThrottling : Int,
                           private val preAllocateFileOnCreation: Boolean) : DownloadManager {
 
     private val lock = Any()
@@ -275,6 +276,18 @@ class DownloadManagerImpl(private val httpDownloader: Downloader<*, *>,
                     retryOnNetworkGain = retryOnNetworkGain,
                     hashCheckingEnabled = hashCheckingEnabled,
                     storageResolver = storageResolver,
+                    preAllocateFileOnCreation = preAllocateFileOnCreation)
+        }else if(downloader.getRequestFileDownloaderType(request, supportedDownloadTypes) == Downloader.FileDownloaderType.SEQUENTIAL_THROTTLING){
+            SequentialFileThrottlingDownloaderImpl(
+                    initialDownload = download,
+                    downloader = downloader,
+                    progressReportingIntervalMillis = progressReportingIntervalMillis,
+                    logger = logger,
+                    networkInfoProvider = networkInfoProvider,
+                    retryOnNetworkGain = retryOnNetworkGain,
+                    hashCheckingEnabled = hashCheckingEnabled,
+                    storageResolver = storageResolver,
+                    bandwidthThrottling = bandwidthThrottling,
                     preAllocateFileOnCreation = preAllocateFileOnCreation)
         } else {
             ParallelFileDownloaderImpl(

@@ -120,6 +120,7 @@ object FetchModulesBuilder {
                     namespace = fetchConfiguration.namespace,
                     groupInfoProvider = groupInfoProvider,
                     globalAutoRetryMaxAttempts = fetchConfiguration.maxAutoRetryAttempts,
+                    bandwidthThrottling        = fetchConfiguration.bandwidthThrottling,
                     preAllocateFileOnCreation = fetchConfiguration.preAllocateFileOnCreation)
             priorityListProcessor = PriorityListProcessorImpl(
                     handlerWrapper = handlerWrapper,

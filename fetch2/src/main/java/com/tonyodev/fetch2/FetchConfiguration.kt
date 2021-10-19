@@ -35,6 +35,7 @@ class FetchConfiguration private constructor(val appContext: Context,
                                              val activeDownloadsCheckInterval: Long,
                                              val createFileOnEnqueue: Boolean,
                                              val maxAutoRetryAttempts: Int,
+                                             val bandwidthThrottling:Int,
                                              val preAllocateFileOnCreation: Boolean) {
 
     /* Creates a new Instance of Fetch with this object's configuration settings. Convenience method
@@ -70,7 +71,17 @@ class FetchConfiguration private constructor(val appContext: Context,
         private var activeDownloadCheckInterval = DEFAULT_HAS_ACTIVE_DOWNLOADS_INTERVAL_IN_MILLISECONDS
         private var createFileOnEnqueue = DEFAULT_CREATE_FILE_ON_ENQUEUE
         private var maxAutoRetryAttempts = DEFAULT_GLOBAL_AUTO_RETRY_ATTEMPTS
+        private var bandwidthThrottling  = DEFAULT_GLOBAL_BANDWIDTH_THOTTLING
         private var preAllocateFileOnCreation = DEFAULT_PREALLOCATE_FILE_ON_CREATE
+
+        /** bandwidth throttling
+         * @param bandwidthThrottling name. If null or empty, the Global namespace is used.
+         * @return Builder
+         * */
+        fun setBandwwidthThottling(bandwidthThrottling: Int): Builder {
+            this.bandwidthThrottling = bandwidthThrottling
+            return this
+        }
 
         /** Sets the namespace which Fetch operates in. Fetch uses
          * a namespace to create a database that the instance will use. Downloads
@@ -387,6 +398,7 @@ class FetchConfiguration private constructor(val appContext: Context,
                     activeDownloadsCheckInterval = activeDownloadCheckInterval,
                     createFileOnEnqueue = createFileOnEnqueue,
                     maxAutoRetryAttempts = maxAutoRetryAttempts,
+                    bandwidthThrottling       = bandwidthThrottling ,
                     preAllocateFileOnCreation = preAllocateFileOnCreation)
         }
 
@@ -468,6 +480,7 @@ class FetchConfiguration private constructor(val appContext: Context,
                 " backgroundHandler=$backgroundHandler, prioritySort=$prioritySort, internetCheckUrl=$internetCheckUrl," +
                 " activeDownloadsCheckInterval=$activeDownloadsCheckInterval, createFileOnEnqueue=$createFileOnEnqueue," +
                 " preAllocateFileOnCreation=$preAllocateFileOnCreation, " +
+                "bandwidthThrottling=$bandwidthThrottling," +
                 "maxAutoRetryAttempts=$maxAutoRetryAttempts)"
     }
 
