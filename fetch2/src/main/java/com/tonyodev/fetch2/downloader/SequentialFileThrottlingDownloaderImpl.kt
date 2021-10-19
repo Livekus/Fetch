@@ -9,6 +9,10 @@ import com.tonyodev.fetch2core.*
 import java.io.*
 import java.net.HttpURLConnection
 import kotlin.math.ceil
+import com.google.common.util.concurrent.RateLimiter
+
+
+
 
 class SequentialFileThrottlingDownloaderImpl(private val initialDownload: Download,
                                              private val downloader: Downloader<*, *>,
@@ -232,8 +236,15 @@ class SequentialFileThrottlingDownloaderImpl(private val initialDownload: Downlo
         val buffer = ByteArray(bufferSize)
         var reportingStartTime = System.nanoTime()
         var downloadSpeedStartTime = System.nanoTime()
-        var read = input.read(buffer, 0, bufferSize)
+        var read  = input.read(buffer, 0, bufferSize)
+        if(bandwidthThrottling >0){
+            read = input.read(buffer, 0, bandwidthThrottling)
+        }
+        val rateLimiter = RateLimiter.create(1.0);
         while (!interrupted && !terminated && read != -1) {
+            if(bandwidthThrottling >0){
+                rateLimiter.acquire()
+            }
             outputResourceWrapper?.write(buffer, 0, read)
             if (!terminated && !interrupted) {
                 downloaded += read
@@ -279,6 +290,9 @@ class SequentialFileThrottlingDownloaderImpl(private val initialDownload: Downlo
                     downloadSpeedStartTime = System.nanoTime()
                 }
                 read = input.read(buffer, 0, bufferSize)
+                if(bandwidthThrottling >0){
+                    read = input.read(buffer, 0, bandwidthThrottling)
+                }
             }
         }
         outputResourceWrapper?.flush()
