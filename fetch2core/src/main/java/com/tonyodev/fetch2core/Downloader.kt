@@ -218,6 +218,10 @@ interface Downloader<T, R> : Closeable {
         /** Performs the download sequentially. Bytes are downloaded in sequence.*/
         SEQUENTIAL,
 
+        /** Performs the download sequentially. Bytes are downloaded in sequence. add bandwidth throttling*/
+        SEQUENTIAL_T,
+
+
         /** Performs the download by splitting parts of the file in parallel for download.
          * Fastest download option*/
         PARALLEL
