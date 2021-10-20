@@ -236,9 +236,12 @@ class SequentialFileThrottlingDownloaderImpl(private val initialDownload: Downlo
         val buffer = ByteArray(bufferSize)
         var reportingStartTime = System.nanoTime()
         var downloadSpeedStartTime = System.nanoTime()
-        var read  = input.read(buffer, 0, bufferSize)
-
         val rateLimiter = RateLimiter.create(1024.0*1024.0);
+        var read  = input.read(buffer, 0, bufferSize)
+        if(bandwidthThrottling >0){
+            rateLimiter.acquire(bufferSize)
+        }
+
         while (!interrupted && !terminated && read != -1) {
 
             outputResourceWrapper?.write(buffer, 0, read)
@@ -263,9 +266,7 @@ class SequentialFileThrottlingDownloaderImpl(private val initialDownload: Downlo
                             downloadedBytesPerSecond = getAverageDownloadedBytesPerSecond())
                     downloadedBytesPerSecond = downloaded
                 }
-                if(bandwidthThrottling >0){
-                    rateLimiter.acquire(bufferSize)
-                }
+
                 reportingStopTime = System.nanoTime()
                 val hasReportingTimeElapsed = hasIntervalTimeElapsed(reportingStartTime,
                         reportingStopTime, progressReportingIntervalMillis)
@@ -288,6 +289,10 @@ class SequentialFileThrottlingDownloaderImpl(private val initialDownload: Downlo
                     downloadSpeedStartTime = System.nanoTime()
                 }
                 read = input.read(buffer, 0, bufferSize)
+                if(bandwidthThrottling >0){
+                    rateLimiter.acquire(bufferSize)
+                }
+
             }
         }
         outputResourceWrapper?.flush()
