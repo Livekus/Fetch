@@ -24,6 +24,9 @@ class SequentialFileThrottlingDownloaderImpl(private val initialDownload: Downlo
                                              private val storageResolver: StorageResolver,
                                              private val bandwidthThrottling : Int,
                                              private val preAllocateFileOnCreation: Boolean) : FileDownloader {
+    companion object {
+        var rateLimiter = RateLimiter.create(64.toDouble());
+    }
 
     @Volatile
     override var interrupted = false
@@ -236,10 +239,6 @@ class SequentialFileThrottlingDownloaderImpl(private val initialDownload: Downlo
         val buffer = ByteArray(bufferSize)
         var reportingStartTime = System.nanoTime()
         var downloadSpeedStartTime = System.nanoTime()
-
-
-        
-        val rateLimiter = RateLimiter.create(64.toDouble());
         var read  = input.read(buffer, 0, bufferSize)
 
 //        if(bandwidthThrottling >0){
@@ -293,9 +292,8 @@ class SequentialFileThrottlingDownloaderImpl(private val initialDownload: Downlo
                     downloadSpeedStartTime = System.nanoTime()
                 }
                 read = input.read(buffer, 0, bufferSize)
-                if(bandwidthThrottling >0){
-                    rateLimiter.acquire()
-                }
+                rateLimiter.acquire()
+
 
             }
         }
