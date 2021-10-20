@@ -238,6 +238,7 @@ class SequentialFileThrottlingDownloaderImpl(private val initialDownload: Downlo
         var downloadSpeedStartTime = System.nanoTime()
 
 
+        
         val rateLimiter = RateLimiter.create(64.toDouble());
         var read  = input.read(buffer, 0, bufferSize)
 
