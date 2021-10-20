@@ -289,10 +289,7 @@ class SequentialFileThrottlingDownloaderImpl(private val initialDownload: Downlo
                 if (downloadSpeedCheckTimeElapsed) {
                     downloadSpeedStartTime = System.nanoTime()
                 }
-                read = input.read(buffer, 0, bufferSize)
-                if(bandwidthThrottling >0){
-                    read = input.read(buffer, 0, bandwidthThrottling)
-                }
+                read = input.read(buffer, 0, 8*1024*1024)
             }
         }
         outputResourceWrapper?.flush()
